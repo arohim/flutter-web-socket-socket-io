@@ -5,6 +5,8 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
 void main() => runApp(MyApp());
 
 const URL = "https://realtime-data.heliotplatform.com";
@@ -76,6 +78,22 @@ class _MyHomePageState extends State<MyHomePage> {
       socketIO.disconnect();
     });
     socketIO.connect();
+  }
+
+  void _socketIOClient() {
+    // Dart client
+    IO.Socket socket =
+        IO.io('https://realtime-data.heliotplatform.com/position', <String, dynamic>{
+      'transports': ['websocket']
+    });
+    socket.on('connect', (_) {
+      print('connect');
+    });
+    socket.on('data', (data) => {
+      print(data)
+    });
+    // socket.on('disconnect', (_) => print('disconnect'));
+    // socket.on('fromServer', (_) => print(_));
   }
 
   void _incrementCounter() {
@@ -153,7 +171,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _webSocket,
+        onPressed: _socketIOClient,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
