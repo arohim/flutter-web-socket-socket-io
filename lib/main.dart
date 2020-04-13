@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/status.dart' as status;
 
 void main() => runApp(MyApp());
 
@@ -59,16 +62,24 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
       print("increment");
-      SocketIO socketIO = SocketIOManager().createSocketIO(
-        "https://realtime-data.heliotplatform.com",
-        '/position',
-      );
-      socketIO.init();
-      socketIO.subscribe('data', (jsonData) {
-        //Convert the JSON data received into a Map
-        print(jsonData);
+      // SocketIO socketIO = SocketIOManager().createSocketIO(
+      //   "https://realtime-data.heliotplatform.com",
+      //   '/position',
+      // );
+      // socketIO.init();
+      // socketIO.subscribe('data', (jsonData) {
+      //   //Convert the JSON data received into a Map
+      //   print(jsonData);
+      // });
+      // socketIO.connect();
+      final channel = IOWebSocketChannel.connect('wss://echo.websocket.org/');
+      // channel.sink.add("connected!");
+      channel.stream.listen((message) {
+        // channel.sink.add("received!");
+        print(message);
+        channel.sink.close(status.goingAway);
       });
-      socketIO.connect();
+      channel.sink.add("connected!");
     });
   }
 
