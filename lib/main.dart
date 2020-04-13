@@ -53,6 +53,31 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  void _webSocket() {
+    final channel = IOWebSocketChannel.connect('wss://echo.websocket.org/');
+    // channel.sink.add("connected!");
+    channel.stream.listen((message) {
+      // channel.sink.add("received!");
+      print(message);
+      channel.sink.close(status.goingAway);
+    });
+    channel.sink.add("connected!");
+  }
+
+  void _socketIO() {
+    SocketIO socketIO = SocketIOManager().createSocketIO(
+      "https://realtime-data.heliotplatform.com",
+      '/position',
+    );
+    socketIO.init();
+    socketIO.subscribe('data', (jsonData) {
+      //Convert the JSON data received into a Map
+      print(jsonData);
+      socketIO.disconnect();
+    });
+    socketIO.connect();
+  }
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -128,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _webSocket,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
